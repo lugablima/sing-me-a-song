@@ -3,7 +3,7 @@ import { faker } from "@faker-js/faker";
 import { Recommendation } from "@prisma/client";
 import app from "../src/app";
 import { prisma } from "../src/database";
-import { deleteAllData, disconnectPrisma } from "./factories/scenarioFactory";
+import { deleteAllData, disconnectPrisma, createScenarioTwelveRecommendations } from "./factories/scenarioFactory";
 import * as recommendationBodyFactory from "./factories/recommendationBodyFactory";
 import { CreateRecommendationData } from "../src/services/recommendationsService";
 import recommendationFactory from "./factories/recommendationFactory";
@@ -122,5 +122,21 @@ describe("POST /:id/downvote", () => {
 		expect(result.status).toBe(200);
 		expect(oldScore).toEqual(-5);
 		expect(recommendationDeleted).toBeNull();
+	});
+});
+
+describe("GET /", () => {
+	it("Should answer with the last 10 recommendations in a specific format", async () => {
+		await createScenarioTwelveRecommendations();
+
+		const result = await server.get("/");
+
+		const recommendations: Recommendation[] = await prisma.recommendation.findMany({
+			orderBy: { id: "desc" },
+			take: 10,
+		});
+
+		expect(result.body.length).toEqual(10);
+		expect(result.body).toEqual(recommendations);
 	});
 });
