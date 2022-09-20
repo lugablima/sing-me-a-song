@@ -8,7 +8,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.use("/recommendations", recommendationRouter);
+app.use(recommendationRouter);
 app.use(errorHandlerMiddleware);
 
 export default app;
