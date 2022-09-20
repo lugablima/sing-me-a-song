@@ -62,7 +62,7 @@ describe("POST /", () => {
 });
 
 describe("POST /:id/upvote", () => {
-	it("Should answer with status 200 when recommendation id exists and update score key", async () => {
+	it("Should answer with status 200 when recommendation id exists and increment score key", async () => {
 		const recommendation: CreateRecommendationData = recommendationBodyFactory.validBody();
 
 		const { id, name, score: oldScore }: Recommendation = await recommendationFactory(recommendation);
@@ -79,6 +79,48 @@ describe("POST /:id/upvote", () => {
 		const id: number = faker.datatype.number();
 		const result = await server.post(`/${id}/upvote`);
 
+		const recommendation: Recommendation | null = await prisma.recommendation.findUnique({ where: { id } });
+
 		expect(result.status).toBe(404);
+		expect(recommendation).toBeNull();
+	});
+});
+
+describe("POST /:id/downvote", () => {
+	it("Should answer with status 200 when recommendation id exists and decrement score key", async () => {
+		const recommendation: CreateRecommendationData = recommendationBodyFactory.validBody();
+
+		const { id, name, score: oldScore }: Recommendation = await recommendationFactory(recommendation);
+
+		const result = await server.post(`/${id}/downvote`);
+
+		const { score: newScore }: Recommendation = await prisma.recommendation.findUnique({ where: { name } });
+
+		expect(result.status).toBe(200);
+		expect(oldScore - 1).toEqual(newScore);
+	});
+
+	it("Should answer with status 404 when recommendation id does not exist", async () => {
+		const id: number = faker.datatype.number();
+		const result = await server.post(`/${id}/downvote`);
+
+		const recommendation: Recommendation | null = await prisma.recommendation.findUnique({ where: { id } });
+
+		expect(result.status).toBe(404);
+		expect(recommendation).toBeNull();
+	});
+
+	it("Should delete the recommendation from the database when your score is less than -5", async () => {
+		const recommendation: CreateRecommendationData = recommendationBodyFactory.validBody();
+
+		const { id, score: oldScore }: Recommendation = await recommendationFactory({ ...recommendation, score: -5 });
+
+		const result = await server.post(`/${id}/downvote`);
+
+		const recommendationDeleted: Recommendation | null = await prisma.recommendation.findUnique({ where: { id } });
+
+		expect(result.status).toBe(200);
+		expect(oldScore).toEqual(-5);
+		expect(recommendationDeleted).toBeNull();
 	});
 });
