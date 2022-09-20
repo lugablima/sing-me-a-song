@@ -140,3 +140,26 @@ describe("GET /", () => {
 		expect(result.body).toEqual(recommendations);
 	});
 });
+
+describe("GET /:id", () => {
+	it("Should answer with the correct recommendation", async () => {
+		const recommendation: CreateRecommendationData = recommendationBodyFactory.validBody();
+
+		const recommendationCreated: Recommendation = await recommendationFactory(recommendation);
+
+		const result = await server.get(`/${recommendationCreated.id}`);
+
+		expect(result.body).toBeInstanceOf(Object);
+		expect(result.body).toEqual(recommendationCreated);
+	});
+
+	it("Should answer with status 404 when recommendation id does not exist", async () => {
+		const id: number = faker.datatype.number();
+		const result = await server.get(`/${id}`);
+
+		const recommendation: Recommendation | null = await prisma.recommendation.findUnique({ where: { id } });
+
+		expect(result.status).toBe(404);
+		expect(recommendation).toBeNull();
+	});
+});
