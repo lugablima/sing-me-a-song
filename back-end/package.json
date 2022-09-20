@@ -5,7 +5,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon src/server.ts"
+    "start": "node ./dist/src/server.js",
+    "dev": "nodemon ./src/server.ts",
+    "build": "npx tsc && npx prisma generate && npx prisma migrate deploy",
+    "test": "dotenv -e .env.test prisma migrate dev && dotenv -e .env.test jest -i --no-cache"
   },
   "keywords": [],
   "author": "",
