@@ -175,8 +175,14 @@ describe("GET /random", () => {
 
 		const result = await server.get("/random");
 
-		expect(result.body).toBeInstanceOf(Object);
-		// Comparar a estrutura do objeto
+		expect(result.body).toEqual(
+			expect.objectContaining<Recommendation>({
+				id: expect.any(Number),
+				name: expect.any(String),
+				youtubeLink: expect.any(String),
+				score: expect.any(Number),
+			})
+		);
 	});
 
 	it("Should answer with status 404 when there is no recommendation registered", async () => {
