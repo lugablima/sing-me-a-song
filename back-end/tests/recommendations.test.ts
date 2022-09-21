@@ -7,7 +7,7 @@ import {
 	deleteAllData,
 	disconnectPrisma,
 	createScenarioTwelveRecommendations,
-	createScenarioTwelveRandomRecommendations,
+	createScenarioTwelveRecommendationsWithRandomScores,
 } from "./factories/scenarioFactory";
 import * as recommendationBodyFactory from "./factories/recommendationBodyFactory";
 import { CreateRecommendationData } from "../src/services/recommendationsService";
@@ -171,7 +171,7 @@ describe("GET /:id", () => {
 
 describe("GET /random", () => {
 	it("Should answer with a random recommendation", async () => {
-		await createScenarioTwelveRandomRecommendations();
+		await createScenarioTwelveRecommendationsWithRandomScores();
 
 		const result = await server.get("/random");
 
@@ -191,7 +191,7 @@ describe("GET /random", () => {
 
 describe("GET /top/:amount", () => {
 	it("Should answer with the correct recommendation ranking, according to the amount parameter passed", async () => {
-		await createScenarioTwelveRandomRecommendations();
+		await createScenarioTwelveRecommendationsWithRandomScores();
 
 		const amount: number = faker.datatype.number({ min: 1, max: 12 });
 

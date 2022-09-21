@@ -30,7 +30,7 @@ export async function createScenarioTwelveRecommendations() {
 	});
 }
 
-export async function createScenarioTwelveRandomRecommendations() {
+export async function createScenarioTwelveRecommendationsWithRandomScores() {
 	await prisma.recommendation.createMany({
 		data: [
 			{ ...validBody(), score: faker.datatype.number({ min: -5, max: 100 }) },
