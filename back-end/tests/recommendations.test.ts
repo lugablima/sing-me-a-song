@@ -3,7 +3,12 @@ import { faker } from "@faker-js/faker";
 import { Recommendation } from "@prisma/client";
 import app from "../src/app";
 import { prisma } from "../src/database";
-import { deleteAllData, disconnectPrisma, createScenarioTwelveRecommendations } from "./factories/scenarioFactory";
+import {
+	deleteAllData,
+	disconnectPrisma,
+	createScenarioTwelveRecommendations,
+	createScenarioTwelveRandomRecommendations,
+} from "./factories/scenarioFactory";
 import * as recommendationBodyFactory from "./factories/recommendationBodyFactory";
 import { CreateRecommendationData } from "../src/services/recommendationsService";
 import recommendationFactory from "./factories/recommendationFactory";
@@ -161,5 +166,25 @@ describe("GET /:id", () => {
 
 		expect(result.status).toBe(404);
 		expect(recommendation).toBeNull();
+	});
+});
+
+describe("GET /random", () => {
+	it("Should answer with a random recommendation", async () => {
+		await createScenarioTwelveRandomRecommendations();
+
+		const result = await server.get("/random");
+
+		expect(result.body).toBeInstanceOf(Object);
+		// Comparar a estrutura do objeto
+	});
+
+	it("Should answer with status 404 when there is no recommendation registered", async () => {
+		const result = await server.get("/random");
+
+		const recommendation: Recommendation[] = await prisma.recommendation.findMany();
+
+		expect(result.status).toBe(404);
+		expect(recommendation.length).toEqual(0);
 	});
 });

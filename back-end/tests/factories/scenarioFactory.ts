@@ -1,3 +1,5 @@
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { faker } from "@faker-js/faker";
 import { prisma } from "../../src/database";
 import { validBody } from "./recommendationBodyFactory";
 
@@ -24,6 +26,25 @@ export async function createScenarioTwelveRecommendations() {
 			validBody(),
 			validBody(),
 			validBody(),
+		],
+	});
+}
+
+export async function createScenarioTwelveRandomRecommendations() {
+	await prisma.recommendation.createMany({
+		data: [
+			{ ...validBody(), score: faker.datatype.number({ min: -5, max: 100 }) },
+			{ ...validBody(), score: faker.datatype.number({ min: -5, max: 100 }) },
+			{ ...validBody(), score: faker.datatype.number({ min: -5, max: 100 }) },
+			{ ...validBody(), score: faker.datatype.number({ min: -5, max: 100 }) },
+			{ ...validBody(), score: faker.datatype.number({ min: -5, max: 100 }) },
+			{ ...validBody(), score: faker.datatype.number({ min: -5, max: 100 }) },
+			{ ...validBody(), score: faker.datatype.number({ min: -5, max: 100 }) },
+			{ ...validBody(), score: faker.datatype.number({ min: -5, max: 100 }) },
+			{ ...validBody(), score: faker.datatype.number({ min: -5, max: 100 }) },
+			{ ...validBody(), score: faker.datatype.number({ min: -5, max: 100 }) },
+			{ ...validBody(), score: faker.datatype.number({ min: -5, max: 100 }) },
+			{ ...validBody(), score: faker.datatype.number({ min: -5, max: 100 }) },
 		],
 	});
 }
