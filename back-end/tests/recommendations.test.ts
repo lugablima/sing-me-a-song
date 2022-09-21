@@ -188,3 +188,22 @@ describe("GET /random", () => {
 		expect(recommendation.length).toEqual(0);
 	});
 });
+
+describe("GET /top/:amount", () => {
+	it("Should answer with the correct recommendation ranking, according to the amount parameter passed", async () => {
+		await createScenarioTwelveRandomRecommendations();
+
+		const amount: number = faker.datatype.number({ min: 1, max: 12 });
+
+		const result = await server.get(`/top/${amount}`);
+
+		const recommendationsExpected: Recommendation[] = await prisma.recommendation.findMany({
+			orderBy: { score: "desc" },
+			take: amount,
+		});
+
+		expect(result.body).toBeInstanceOf(Array);
+		expect(result.body.length).toEqual(amount);
+		expect(result.body).toEqual(recommendationsExpected);
+	});
+});
