@@ -29,7 +29,7 @@ describe("POST /", () => {
 
 		const result = await server.post("/").send(recommendation);
 
-		const recommendationCreated: Recommendation = await prisma.recommendation.findUnique({
+		const recommendationCreated: Recommendation | null = await prisma.recommendation.findUnique({
 			where: { name: recommendation.name },
 		});
 
@@ -74,7 +74,7 @@ describe("POST /:id/upvote", () => {
 
 		const result = await server.post(`/${id}/upvote`);
 
-		const { score: newScore }: Recommendation = await prisma.recommendation.findUnique({ where: { name } });
+		const { score: newScore } = (await prisma.recommendation.findUnique({ where: { name } })) as Recommendation;
 
 		expect(result.status).toBe(200);
 		expect(oldScore + 1).toEqual(newScore);
@@ -99,7 +99,7 @@ describe("POST /:id/downvote", () => {
 
 		const result = await server.post(`/${id}/downvote`);
 
-		const { score: newScore }: Recommendation = await prisma.recommendation.findUnique({ where: { name } });
+		const { score: newScore } = (await prisma.recommendation.findUnique({ where: { name } })) as Recommendation;
 
 		expect(result.status).toBe(200);
 		expect(oldScore - 1).toEqual(newScore);
