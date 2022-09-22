@@ -1,17 +1,17 @@
 import supertest from "supertest";
 import { faker } from "@faker-js/faker";
 import { Recommendation } from "@prisma/client";
-import app from "../src/app";
-import { prisma } from "../src/database";
+import app from "../../src/app";
+import { prisma } from "../../src/database";
 import {
 	deleteAllData,
 	disconnectPrisma,
 	createScenarioTwelveRecommendations,
 	createScenarioTwelveRecommendationsWithRandomScores,
-} from "./factories/scenarioFactory";
-import * as recommendationBodyFactory from "./factories/recommendationBodyFactory";
-import { CreateRecommendationData } from "../src/services/recommendationsService";
-import recommendationFactory from "./factories/recommendationFactory";
+} from "../factories/scenarioFactory";
+import * as recommendationBodyFactory from "../factories/recommendationBodyFactory";
+import { CreateRecommendationData } from "../../src/services/recommendationsService";
+import recommendationFactory from "../factories/recommendationFactory";
 
 beforeEach(async () => {
 	await deleteAllData();
