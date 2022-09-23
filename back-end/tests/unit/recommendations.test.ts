@@ -128,3 +128,29 @@ describe("Get function", () => {
 		expect(result).toBeInstanceOf(Array);
 	});
 });
+
+describe("Get by id function", () => {
+	it("Should return an recommendation", async () => {
+		const id: number = faker.datatype.number();
+		const recommendation: Recommendation = recommendationBodyFactory.validCompleteBody();
+
+		jest.spyOn(recommendationRepository, "find").mockResolvedValueOnce(recommendation);
+
+		const result = await recommendationService.getById(id);
+
+		expect(recommendationRepository.find).toBeCalled();
+		expect(result).toEqual(recommendation);
+	});
+
+	it("Should trigger an error when recommendation id is not found", async () => {
+		const id: number = faker.datatype.number();
+		const expectedError: AppError = { type: "not_found", message: "" };
+
+		jest.spyOn(recommendationRepository, "find").mockResolvedValueOnce(null);
+
+		const promise = recommendationService.getById(id);
+
+		expect(recommendationRepository.find).toBeCalled();
+		expect(promise).rejects.toEqual(expectedError);
+	});
+});
