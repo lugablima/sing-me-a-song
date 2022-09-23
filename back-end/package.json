@@ -7,7 +7,7 @@
     "start": "node ./dist/src/server.js",
     "dev": "dotenv -e .env.test nodemon ./src/server.ts",
     "build": "npx tsc && npx prisma generate && npx prisma migrate deploy",
-    "test": "dotenv -e .env.test prisma migrate dev && dotenv -e .env.test jest -i --node_modules/.bin/jest --coverage"
+    "test": "dotenv -e .env.test prisma migrate dev && dotenv -e .env.test -- jest --runInBand --coverage"
   },
   "keywords": [],
   "author": "",
