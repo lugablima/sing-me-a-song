@@ -115,3 +115,16 @@ describe("Downvote function", () => {
 		expect(recommendationRepository.remove).toBeCalled();
 	});
 });
+
+describe("Get function", () => {
+	it("Should return an array of recommendations", async () => {
+		const recommendation: Recommendation = recommendationBodyFactory.validCompleteBody();
+
+		jest.spyOn(recommendationRepository, "findAll").mockResolvedValueOnce([recommendation]);
+
+		const result = await recommendationService.get();
+
+		expect(recommendationRepository.findAll).toBeCalled();
+		expect(result).toBeInstanceOf(Array);
+	});
+});
