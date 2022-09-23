@@ -1,3 +1,5 @@
+import { Recommendation } from "@prisma/client";
+import { faker } from "@faker-js/faker";
 import { recommendationService, CreateRecommendationData } from "../../src/services/recommendationsService";
 import { recommendationRepository } from "../../src/repositories/recommendationRepository";
 import * as recommendationBodyFactory from "../factories/recommendationBodyFactory";
@@ -37,5 +39,33 @@ describe("Insert function", () => {
 		expect(recommendationRepository.findByName).toBeCalled();
 		expect(promise).rejects.toEqual(expectedError);
 		expect(recommendationRepository.create).not.toBeCalled();
+	});
+});
+
+describe("Upvote function", () => {
+	it("Should increase the recommendation score", async () => {
+		const recommendation: Recommendation = recommendationBodyFactory.validCompleteBody();
+
+		jest.spyOn(recommendationRepository, "find").mockResolvedValueOnce(recommendation);
+
+		jest.spyOn(recommendationRepository, "updateScore").mockResolvedValueOnce(recommendation);
+
+		await recommendationService.upvote(recommendation.id);
+
+		expect(recommendationRepository.find).toBeCalled();
+		expect(recommendationRepository.updateScore).toBeCalled();
+	});
+
+	it("Should trigger an error and not update the recommendation", async () => {
+		const id: number = faker.datatype.number();
+		const expectedError: AppError = { type: "not_found", message: "" };
+
+		jest.spyOn(recommendationRepository, "find").mockResolvedValueOnce(null);
+
+		const promise = recommendationService.upvote(id);
+
+		expect(promise).rejects.toEqual(expectedError);
+		expect(recommendationRepository.find).toBeCalled();
+		expect(recommendationRepository.updateScore).not.toBeCalled();
 	});
 });
