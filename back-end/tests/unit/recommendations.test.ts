@@ -154,3 +154,18 @@ describe("Get by id function", () => {
 		expect(promise).rejects.toEqual(expectedError);
 	});
 });
+
+describe("Get random function", () => {
+	it("Should return an array of recommendations", async () => {
+		const amount: number = 1;
+		const recommendation: Recommendation = recommendationBodyFactory.validCompleteBody();
+
+		jest.spyOn(recommendationRepository, "getAmountByScore").mockResolvedValueOnce([recommendation]);
+
+		const result = await recommendationService.getTop(amount);
+
+		expect(recommendationRepository.getAmountByScore).toBeCalled();
+		expect(result).toBeInstanceOf(Array);
+		expect(result.length).toEqual(amount);
+	});
+});
