@@ -31,7 +31,7 @@ describe("Test the Home page", () => {
     cy.get("[data-cy=scoreContainer]").contains(0);
   });
 
-  it("Should return a 422 error when the recommendation name is not sent", () => {
+  it("Should return a message error when the recommendation name is not sent", () => {
     // let recommendation = 0;  
     // cy.createRecommendationBody().then(body => recommendation = body);
 
@@ -58,7 +58,7 @@ describe("Test the Home page", () => {
     cy.contains("No recommendations yet! Create your own :)");
   });
 
-  it("Should return a 422 error when the recommendation link is not sent", () => {
+  it("Should return a message error when the recommendation link is not sent", () => {
     // let recommendation = 0;  
     // cy.createRecommendationBody().then(body => recommendation = body);
 
@@ -85,7 +85,7 @@ describe("Test the Home page", () => {
     cy.contains("No recommendations yet! Create your own :)");
   });
 
-  it("Should return a 422 error when the recommendation name and link are not sent", () => {
+  it("Should return a message error when the recommendation name and link are not sent", () => {
     // let recommendation = 0;  
     // cy.createRecommendationBody().then(body => recommendation = body);
 
@@ -105,7 +105,7 @@ describe("Test the Home page", () => {
     cy.contains("No recommendations yet! Create your own :)");
   });
 
-  it("Should return a 422 error when the recommendation link is invalid", () => {
+  it("Should return a message error when the recommendation link is invalid", () => {
     // let recommendation = 0;  
     // cy.createRecommendationBody().then(body => recommendation = body);
 
@@ -218,5 +218,25 @@ describe("Test the Home page", () => {
         cy.get("[data-cy=scoreContainer]").should("not.exist");
       });
     });
+  });
+
+  it("Should navigate to top page", () => {
+    cy.visit('http://localhost:3000/');
+    cy.contains("No recommendations yet! Create your own :)");
+
+    cy.get("[data-cy=top]").click();
+
+    cy.url().should("equal", "http://localhost:3000/top");
+    cy.contains("No recommendations yet! Create your own :)");
+  });
+
+  it("Should navigate to random page", () => {
+    cy.visit('http://localhost:3000/');
+    cy.contains("No recommendations yet! Create your own :)");
+
+    cy.get("[data-cy=random]").click();
+
+    cy.url().should("equal", "http://localhost:3000/random");
+    cy.contains("Loading...");
   });
 });

@@ -1,5 +1,3 @@
-import { faker } from "@faker-js/faker";
-
 beforeEach(async () => {
   await cy.resetDatabase();
 });
@@ -84,4 +82,24 @@ describe("Test the Home page", () => {
           });
         });
       });
+    
+    it("Should navigate to home page", () => {
+        cy.visit('http://localhost:3000/top');
+        cy.contains("No recommendations yet! Create your own :)");
+
+        cy.get("[data-cy=home]").click();
+
+        cy.url().should("equal", "http://localhost:3000/");
+        cy.contains("No recommendations yet! Create your own :)");
+    });
+
+    it("Should navigate to random page", () => {
+        cy.visit('http://localhost:3000/top');
+        cy.contains("No recommendations yet! Create your own :)");
+
+        cy.get("[data-cy=random]").click();
+
+        cy.url().should("equal", "http://localhost:3000/random");
+        cy.contains("Loading...");
+    });
 });
