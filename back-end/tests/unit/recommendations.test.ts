@@ -8,6 +8,7 @@ import { AppError } from "../../src/utils/errorUtils";
 beforeEach(() => {
 	jest.resetAllMocks();
 	jest.clearAllMocks();
+	jest.spyOn(global.Math, "random").mockRestore();
 });
 
 describe("Insert function", () => {
@@ -142,7 +143,7 @@ describe("Get by id function", () => {
 		expect(result).toEqual(recommendation);
 	});
 
-	it("Should trigger an error when recommendation id is not found", async () => {
+	it("Should trigger an error when recommendation id is not found", () => {
 		const id: number = faker.datatype.number();
 		const expectedError: AppError = { type: "not_found", message: "" };
 
@@ -155,7 +156,7 @@ describe("Get by id function", () => {
 	});
 });
 
-describe("Get random function", () => {
+describe("Get top function", () => {
 	it("Should return an array of recommendations", async () => {
 		const amount: number = 1;
 		const recommendation: Recommendation = recommendationBodyFactory.validCompleteBody();
@@ -167,5 +168,64 @@ describe("Get random function", () => {
 		expect(recommendationRepository.getAmountByScore).toBeCalled();
 		expect(result).toBeInstanceOf(Array);
 		expect(result.length).toEqual(amount);
+	});
+});
+
+describe("Get random function", () => {
+	it("Should return a random recommendation with a score greater than 10", async () => {
+		const random: number = faker.datatype.number({ min: 0, max: 0.6, precision: 0.1 });
+		const recommendation: Recommendation = recommendationBodyFactory.validCompleteBody();
+
+		jest.spyOn(Math, "random").mockReturnValueOnce(random);
+		jest.spyOn(recommendationRepository, "findAll").mockResolvedValueOnce([recommendation]);
+
+		const result = await recommendationService.getRandom();
+
+		expect(Math.random).toBeCalledTimes(2);
+		expect(recommendationRepository.findAll).toBeCalledTimes(1);
+		expect(result).toEqual(recommendation);
+	});
+
+	it("Should return a random recommendation with a score between -5 and 10", async () => {
+		const random: number = faker.datatype.number({ min: 0.7, max: 0.9, precision: 0.1 });
+		const recommendation: Recommendation = recommendationBodyFactory.validCompleteBody();
+
+		jest.spyOn(Math, "random").mockReturnValueOnce(random);
+		jest.spyOn(recommendationRepository, "findAll").mockResolvedValueOnce([recommendation]);
+
+		const result = await recommendationService.getRandom();
+
+		expect(Math.random).toBeCalledTimes(2);
+		expect(recommendationRepository.findAll).toBeCalledTimes(1);
+		expect(result).toEqual(recommendation);
+	});
+
+	it("Should return a random recommendation", async () => {
+		const random: number = faker.datatype.number({ min: 0, max: 1, precision: 0.1 });
+		const recommendation: Recommendation = recommendationBodyFactory.validCompleteBody();
+
+		jest.spyOn(Math, "random").mockReturnValueOnce(random);
+		jest.spyOn(recommendationRepository, "findAll")
+			.mockResolvedValueOnce([])
+			.mockResolvedValueOnce([recommendation]);
+
+		const result = await recommendationService.getRandom();
+
+		expect(Math.random).toBeCalledTimes(2);
+		expect(recommendationRepository.findAll).toBeCalledTimes(2);
+		expect(result).toEqual(recommendation);
+	});
+
+	it("Should trigger an error when there is no song registered", async () => {
+		const random: number = faker.datatype.number({ min: 0, max: 1, precision: 0.1 });
+		const expectedError: AppError = { type: "not_found", message: "" };
+
+		jest.spyOn(Math, "random").mockReturnValueOnce(random);
+		jest.spyOn(recommendationRepository, "findAll").mockResolvedValueOnce([]).mockResolvedValueOnce([]);
+
+		expect.assertions(3);
+		await expect(recommendationService.getRandom()).rejects.toEqual(expectedError);
+		expect(Math.random).toBeCalledTimes(1);
+		expect(recommendationRepository.findAll).toBeCalledTimes(2);
 	});
 });
