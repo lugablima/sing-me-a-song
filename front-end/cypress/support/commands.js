@@ -28,13 +28,19 @@ Cypress.Commands.add("createRecommendation", () => {
         youtubeLink: `https://www.youtube.com/watch?v=${faker.internet.password()}`,
     }
 
-    cy.request("POST", "http://localhost:5000/recommendations", recommendation);
+    cy.request("POST", "http://localhost:5000/recommendations", recommendation).then(() => {
+        return cy.wrap(recommendation);
+    });
 });
 
 Cypress.Commands.add("getRecommendations", () => {
     cy.request("GET", "http://localhost:5000/recommendations").then((data) => {
         return cy.wrap(data.body[0]);
     });
+});
+
+Cypress.Commands.add("upvoteRecommendation", recommendationId => {
+    cy.request("POST", `http://localhost:5000/recommendations/${recommendationId}/upvote`);
 });
 
 Cypress.Commands.add("downvoteRecommendation", recommendationId => {
