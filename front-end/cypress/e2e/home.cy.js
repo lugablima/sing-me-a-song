@@ -1,242 +1,245 @@
 import { faker } from "@faker-js/faker";
 
 beforeEach(async () => {
-  await cy.resetDatabase();
+	await cy.resetDatabase();
 });
 
 describe("Test the Home page", () => {
-  it("Should create a recommendation", () => {
-    // let recommendation = 0;  
-    // cy.createRecommendationBody().then(body => recommendation = body);
+	it("Should create a recommendation", () => {
+		const recommendation = {
+			name: faker.lorem.words(),
+			youtubeLink: `https://www.youtube.com/watch?v=${faker.internet.password()}`,
+		};
 
-    const recommendation = {
-      name: faker.lorem.words(),
-      youtubeLink: `https://www.youtube.com/watch?v=${faker.internet.password()}`,
-  }
+		cy.visit("http://localhost:3000");
+		cy.contains("No recommendations yet! Create your own :)");
 
-    cy.visit('http://localhost:3000');
-    cy.contains("No recommendations yet! Create your own :)");
+		cy.get("[data-cy=name]").type(recommendation.name);
+		cy.get("[data-cy=link]").type(recommendation.youtubeLink);
 
-    cy.get("[data-cy=name]").type(recommendation.name);
-    cy.get("[data-cy=link]").type(recommendation.youtubeLink);
-    
-    cy.intercept("POST", "http://localhost:5000/recommendations").as("createRecommendation");
+		cy.intercept("POST", "http://localhost:5000/recommendations").as(
+			"createRecommendation"
+		);
 
-    cy.get("[data-cy=create]").click();
+		cy.get("[data-cy=create]").click();
 
-    cy.wait("@createRecommendation");
+		cy.wait("@createRecommendation");
 
-    cy.get("[data-cy=recommendationName]").contains(recommendation.name);
-    // cy.get("[data-cy=player]").should("have.attr", "url").and("equal", recommendation.youtubeLink);
-    cy.get("[data-cy=scoreContainer]").contains(0);
-  });
+		cy.get("[data-cy=recommendationName]").contains(recommendation.name);
+		cy.get("[data-cy=scoreContainer]").contains(0);
+	});
 
-  it("Should return a message error when the recommendation name is not sent", () => {
-    // let recommendation = 0;  
-    // cy.createRecommendationBody().then(body => recommendation = body);
+	it("Should return a message error when the recommendation name is not sent", () => {
+		const recommendation = {
+			name: faker.lorem.words(),
+			youtubeLink: `https://www.youtube.com/watch?v=${faker.internet.password()}`,
+		};
 
-    const recommendation = {
-      name: faker.lorem.words(),
-      youtubeLink: `https://www.youtube.com/watch?v=${faker.internet.password()}`,
-    }
+		cy.visit("http://localhost:3000");
+		cy.contains("No recommendations yet! Create your own :)");
 
-    cy.visit('http://localhost:3000');
-    cy.contains("No recommendations yet! Create your own :)");
+		cy.get("[data-cy=link]").type(recommendation.youtubeLink);
 
-    cy.get("[data-cy=link]").type(recommendation.youtubeLink);
-    
-    cy.intercept("POST", "http://localhost:5000/recommendations").as("createRecommendation");
+		cy.intercept("POST", "http://localhost:5000/recommendations").as(
+			"createRecommendation"
+		);
 
-    cy.get("[data-cy=create]").click();
+		cy.get("[data-cy=create]").click();
 
-    cy.wait("@createRecommendation");
+		cy.wait("@createRecommendation");
 
-    cy.on("window:alert", (alertMessage) => {
-      expect(alertMessage).to.contains("Error creating recommendation!");
-    });
-    
-    cy.contains("No recommendations yet! Create your own :)");
-  });
+		cy.on("window:alert", (alertMessage) => {
+			expect(alertMessage).to.contains("Error creating recommendation!");
+		});
 
-  it("Should return a message error when the recommendation link is not sent", () => {
-    // let recommendation = 0;  
-    // cy.createRecommendationBody().then(body => recommendation = body);
+		cy.contains("No recommendations yet! Create your own :)");
+	});
 
-    const recommendation = {
-      name: faker.lorem.words(),
-      youtubeLink: `https://www.youtube.com/watch?v=${faker.internet.password()}`,
-    }
+	it("Should return a message error when the recommendation link is not sent", () => {
+		const recommendation = {
+			name: faker.lorem.words(),
+			youtubeLink: `https://www.youtube.com/watch?v=${faker.internet.password()}`,
+		};
 
-    cy.visit('http://localhost:3000');
-    cy.contains("No recommendations yet! Create your own :)");
+		cy.visit("http://localhost:3000");
+		cy.contains("No recommendations yet! Create your own :)");
 
-    cy.get("[data-cy=name]").type(recommendation.name);
-    
-    cy.intercept("POST", "http://localhost:5000/recommendations").as("createRecommendation");
+		cy.get("[data-cy=name]").type(recommendation.name);
 
-    cy.get("[data-cy=create]").click();
+		cy.intercept("POST", "http://localhost:5000/recommendations").as(
+			"createRecommendation"
+		);
 
-    cy.wait("@createRecommendation");
+		cy.get("[data-cy=create]").click();
 
-    cy.on("window:alert", (alertMessage) => {
-      expect(alertMessage).to.contains("Error creating recommendation!");
-    });
-    
-    cy.contains("No recommendations yet! Create your own :)");
-  });
+		cy.wait("@createRecommendation");
 
-  it("Should return a message error when the recommendation name and link are not sent", () => {
-    // let recommendation = 0;  
-    // cy.createRecommendationBody().then(body => recommendation = body);
+		cy.on("window:alert", (alertMessage) => {
+			expect(alertMessage).to.contains("Error creating recommendation!");
+		});
 
-    cy.visit('http://localhost:3000');
-    cy.contains("No recommendations yet! Create your own :)");
-    
-    cy.intercept("POST", "http://localhost:5000/recommendations").as("createRecommendation");
+		cy.contains("No recommendations yet! Create your own :)");
+	});
 
-    cy.get("[data-cy=create]").click();
+	it("Should return a message error when the recommendation name and link are not sent", () => {
+		cy.visit("http://localhost:3000");
+		cy.contains("No recommendations yet! Create your own :)");
 
-    cy.wait("@createRecommendation");
+		cy.intercept("POST", "http://localhost:5000/recommendations").as(
+			"createRecommendation"
+		);
 
-    cy.on("window:alert", (alertMessage) => {
-      expect(alertMessage).to.contains("Error creating recommendation!");
-    });
-    
-    cy.contains("No recommendations yet! Create your own :)");
-  });
+		cy.get("[data-cy=create]").click();
 
-  it("Should return a message error when the recommendation link is invalid", () => {
-    // let recommendation = 0;  
-    // cy.createRecommendationBody().then(body => recommendation = body);
+		cy.wait("@createRecommendation");
 
-    const recommendation = {
-      name: faker.lorem.words(),
-      youtubeLink: `https://www.youtube.com/watch?v=${faker.internet.password()}`,
-    }
+		cy.on("window:alert", (alertMessage) => {
+			expect(alertMessage).to.contains("Error creating recommendation!");
+		});
 
-    recommendation.youtubeLink = faker.internet.avatar();
+		cy.contains("No recommendations yet! Create your own :)");
+	});
 
-    cy.visit('http://localhost:3000');
-    cy.contains("No recommendations yet! Create your own :)");
+	it("Should return a message error when the recommendation link is invalid", () => {
+		const recommendation = {
+			name: faker.lorem.words(),
+			youtubeLink: `https://www.youtube.com/watch?v=${faker.internet.password()}`,
+		};
 
-    cy.get("[data-cy=name]").type(recommendation.name);
-    cy.get("[data-cy=link]").type(recommendation.youtubeLink);
-    
-    cy.intercept("POST", "http://localhost:5000/recommendations").as("createRecommendation");
+		recommendation.youtubeLink = faker.internet.avatar();
 
-    cy.get("[data-cy=create]").click();
+		cy.visit("http://localhost:3000");
+		cy.contains("No recommendations yet! Create your own :)");
 
-    cy.wait("@createRecommendation");
+		cy.get("[data-cy=name]").type(recommendation.name);
+		cy.get("[data-cy=link]").type(recommendation.youtubeLink);
 
-    cy.on("window:alert", (alertMessage) => {
-      expect(alertMessage).to.contains("Error creating recommendation!");
-    });
-    
-    cy.contains("No recommendations yet! Create your own :)");
-  });
+		cy.intercept("POST", "http://localhost:5000/recommendations").as(
+			"createRecommendation"
+		);
 
-  it("Should increase the recommendation score", () => {
-    const recommendation = {
-      name: faker.lorem.words(),
-      youtubeLink: `https://www.youtube.com/watch?v=${faker.internet.password()}`,
-    }
-    
-    cy.visit('http://localhost:3000');
-    cy.contains("No recommendations yet! Create your own :)");
-    
-    cy.get("[data-cy=name]").type(recommendation.name);
-    cy.get("[data-cy=link]").type(recommendation.youtubeLink);
-    cy.get("[data-cy=create]").click();
+		cy.get("[data-cy=create]").click();
 
-    cy.wait(3000);
+		cy.wait("@createRecommendation");
 
-    cy.getRecommendations().then(({ id }) => {
-      cy.intercept("POST", `http://localhost:5000/recommendations/${id}/upvote`).as("upvoteRecommendation");
+		cy.on("window:alert", (alertMessage) => {
+			expect(alertMessage).to.contains("Error creating recommendation!");
+		});
 
-      cy.get("[data-cy=arrowUp]").click();
-  
-      cy.wait("@upvoteRecommendation");
-      
-      cy.get("[data-cy=scoreContainer]").contains(1);
-    });
-  });
+		cy.contains("No recommendations yet! Create your own :)");
+	});
 
-  it("Should decrement the recommendation score", () => {
-    const recommendation = {
-      name: faker.lorem.words(),
-      youtubeLink: `https://www.youtube.com/watch?v=${faker.internet.password()}`,
-    }
-    
-    cy.visit('http://localhost:3000');
-    cy.contains("No recommendations yet! Create your own :)");
-    
-    cy.get("[data-cy=name]").type(recommendation.name);
-    cy.get("[data-cy=link]").type(recommendation.youtubeLink);
-    cy.get("[data-cy=create]").click();
+	it("Should increase the recommendation score", () => {
+		const recommendation = {
+			name: faker.lorem.words(),
+			youtubeLink: `https://www.youtube.com/watch?v=${faker.internet.password()}`,
+		};
 
-    cy.wait(3000);
+		cy.visit("http://localhost:3000");
+		cy.contains("No recommendations yet! Create your own :)");
 
-    cy.getRecommendations().then(({ id }) => {
-      cy.intercept("POST", `http://localhost:5000/recommendations/${id}/downvote`).as("downvoteRecommendation");
+		cy.get("[data-cy=name]").type(recommendation.name);
+		cy.get("[data-cy=link]").type(recommendation.youtubeLink);
+		cy.get("[data-cy=create]").click();
 
-      cy.get("[data-cy=arrowDown]").click();
-  
-      cy.wait("@downvoteRecommendation");
-      
-      cy.get("[data-cy=scoreContainer]").contains(-1);
-    });
-  });
+		cy.wait(3000);
 
-  it("Should exclude the recommendation when the score is less than -5", () => {
-    const recommendation = {
-      name: faker.lorem.words(),
-      youtubeLink: `https://www.youtube.com/watch?v=${faker.internet.password()}`,
-    }
-    
-    cy.visit('http://localhost:3000');
-    cy.contains("No recommendations yet! Create your own :)");
-    
-    cy.get("[data-cy=name]").type(recommendation.name);
-    cy.get("[data-cy=link]").type(recommendation.youtubeLink);
-    cy.get("[data-cy=create]").click();
+		cy.getRecommendations().then(({ id }) => {
+			cy.intercept(
+				"POST",
+				`http://localhost:5000/recommendations/${id}/upvote`
+			).as("upvoteRecommendation");
 
-    cy.wait(3000);
+			cy.get("[data-cy=arrowUp]").click();
 
-    cy.getRecommendations().then(({ id }) => {
-      cy.downvoteRecommendation(id);
-      cy.downvoteRecommendation(id);
-      cy.downvoteRecommendation(id);
-      cy.downvoteRecommendation(id);
-      cy.downvoteRecommendation(id).then(() => {
-        cy.intercept("POST", `http://localhost:5000/recommendations/${id}/downvote`).as("downvoteRecommendation");
+			cy.wait("@upvoteRecommendation");
 
-        cy.get("[data-cy=arrowDown]").click();
-    
-        cy.wait("@downvoteRecommendation");
-        
-        cy.get("[data-cy=recommendationName]").should("not.exist");
-        cy.get("[data-cy=scoreContainer]").should("not.exist");
-      });
-    });
-  });
+			cy.get("[data-cy=scoreContainer]").contains(1);
+		});
+	});
 
-  it("Should navigate to top page", () => {
-    cy.visit('http://localhost:3000/');
-    cy.contains("No recommendations yet! Create your own :)");
+	it("Should decrement the recommendation score", () => {
+		const recommendation = {
+			name: faker.lorem.words(),
+			youtubeLink: `https://www.youtube.com/watch?v=${faker.internet.password()}`,
+		};
 
-    cy.get("[data-cy=top]").click();
+		cy.visit("http://localhost:3000");
+		cy.contains("No recommendations yet! Create your own :)");
 
-    cy.url().should("equal", "http://localhost:3000/top");
-    cy.contains("No recommendations yet! Create your own :)");
-  });
+		cy.get("[data-cy=name]").type(recommendation.name);
+		cy.get("[data-cy=link]").type(recommendation.youtubeLink);
+		cy.get("[data-cy=create]").click();
 
-  it("Should navigate to random page", () => {
-    cy.visit('http://localhost:3000/');
-    cy.contains("No recommendations yet! Create your own :)");
+		cy.wait(3000);
 
-    cy.get("[data-cy=random]").click();
+		cy.getRecommendations().then(({ id }) => {
+			cy.intercept(
+				"POST",
+				`http://localhost:5000/recommendations/${id}/downvote`
+			).as("downvoteRecommendation");
 
-    cy.url().should("equal", "http://localhost:3000/random");
-    cy.contains("Loading...");
-  });
+			cy.get("[data-cy=arrowDown]").click();
+
+			cy.wait("@downvoteRecommendation");
+
+			cy.get("[data-cy=scoreContainer]").contains(-1);
+		});
+	});
+
+	it("Should exclude the recommendation when the score is less than -5", () => {
+		const recommendation = {
+			name: faker.lorem.words(),
+			youtubeLink: `https://www.youtube.com/watch?v=${faker.internet.password()}`,
+		};
+
+		cy.visit("http://localhost:3000");
+		cy.contains("No recommendations yet! Create your own :)");
+
+		cy.get("[data-cy=name]").type(recommendation.name);
+		cy.get("[data-cy=link]").type(recommendation.youtubeLink);
+		cy.get("[data-cy=create]").click();
+
+		cy.wait(3000);
+
+		cy.getRecommendations().then(({ id }) => {
+			cy.downvoteRecommendation(id);
+			cy.downvoteRecommendation(id);
+			cy.downvoteRecommendation(id);
+			cy.downvoteRecommendation(id);
+			cy.downvoteRecommendation(id).then(() => {
+				cy.intercept(
+					"POST",
+					`http://localhost:5000/recommendations/${id}/downvote`
+				).as("downvoteRecommendation");
+
+				cy.get("[data-cy=arrowDown]").click();
+
+				cy.wait("@downvoteRecommendation");
+
+				cy.get("[data-cy=recommendationName]").should("not.exist");
+				cy.get("[data-cy=scoreContainer]").should("not.exist");
+			});
+		});
+	});
+
+	it("Should navigate to top page", () => {
+		cy.visit("http://localhost:3000/");
+		cy.contains("No recommendations yet! Create your own :)");
+
+		cy.get("[data-cy=top]").click();
+
+		cy.url().should("equal", "http://localhost:3000/top");
+		cy.contains("No recommendations yet! Create your own :)");
+	});
+
+	it("Should navigate to random page", () => {
+		cy.visit("http://localhost:3000/");
+		cy.contains("No recommendations yet! Create your own :)");
+
+		cy.get("[data-cy=random]").click();
+
+		cy.url().should("equal", "http://localhost:3000/random");
+		cy.contains("Loading...");
+	});
 });
