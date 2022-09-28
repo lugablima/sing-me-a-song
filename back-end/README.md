@@ -189,7 +189,7 @@ Clone the project
 Go to the project directory
 
 ```bash
-  cd sing-me-a-song/
+  cd sing-me-a-song/back-end
 ```
 
 Install dependencies
